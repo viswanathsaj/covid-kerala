@@ -1,2 +1,2 @@
 # Kerala COVID
-A telegram bot to notify users of district-wise availability of vaccines and other relevant announcement or information. 
+A Telegram bot to notify users of district-wise availability of vaccines and other relevant announcement or information. 

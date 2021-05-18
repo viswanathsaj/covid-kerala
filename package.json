@@ -1,0 +1,24 @@
+{
+  "name": "covidhelper",
+  "version": "1.0.0",
+  "main": "bot/main.js",
+  "type":"module",
+  "repository": "https://github.com/viswanathsaj/covidhelper.git",
+  "author": "Viswanath Saj <11457868+viswanathsaj@users.noreply.github.com>",
+  "license": "BSD 3",
+  "scripts": {
+    "start": "node --experimental-modules --es-module-specifier-resolution=node bot/main.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "axios": "^0.21.1",
+    "dotenv": "^8.2.0",
+    "mongoose": "^5.12.9",
+    "node-cron": "^3.0.0",
+    "node-telegram-bot-api": "^0.53.0"
+  },
+  "devDependencies": {
+    "ngrok": "^4.0.1",
+    "nodemon": "^2.0.7"
+  }
+}

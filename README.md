@@ -29,3 +29,7 @@ services:
   ```
 
 5. Run `docker-compose up --build` and the containers should be mounted and the server should start running
+
+*New releses are automatically built and pushed into production*
+
+The production version is currently runninng on *@covidkeralabot* 

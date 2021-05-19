@@ -1,5 +1,5 @@
 # COVID Kerala
-A Telegram bot to notify users of district-wise availability of vaccines and other relevant announcement or information. 
+A Telegram bot to notify users of district-wise availability of vaccines and other relevant announcements, information or statistics.
 
 ### Configuring a testing environment 
 
@@ -32,4 +32,4 @@ services:
 
 *New releses are automatically built and pushed into production*
 
-The production version is currently runninng on *@covidkeralabot* 
+The production version is currently runninng on **@covidkeralabot**

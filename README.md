@@ -26,11 +26,6 @@ services:
     - "8080:8080"
     depends_on:
     - mongodb
-  watchtower:
-    image: containrrr/watchtower 
-    volumes:
-    - /var/run/docker.sock:/var/run/docker.sock
-    command: --interval 30
   ```
 
 5. Run `docker-compose up --build` and the containers should be mounted and the server should start running

@@ -13,15 +13,16 @@ const bot = new TelegramBot(process.env.TELEGRAM_TOKEN, {polling: true});
 
 async function connect() {
     await mongoose.connect(
-  "mongodb://mongodb:27017/kerala-covid",
-  { useUnifiedTopology: true }
+        "mongodb://mongodb:27017/kerala-covid",
+        {
+            useUnifiedTopology: true,
+            useNewUrlParser: true
+        }
 );
 console.log("Connected")
 }
 
 connect()
-
-bot.sendMessage(1620118953, "Server Started")
 
 async function addUserId(distId, Id) {
     if(await Chats.exists({ chats: Id })){
@@ -64,66 +65,56 @@ bot.onText(/\/start/, (msg) => {
 bot.onText(/\/subscribe/, (msg) => {
     
     const chatId = msg.chat.id;
-    captureDistrict(chatId, 17)
-
-    })
-
- function captureDistrict(chatId, stateId) {
-
     const sendOpts = {
         parse_mode : "Markdown",
         reply_markup: JSON.stringify(
             {
-                force_reply: true,
+                "keyboard": [
+                    ['Alapuzha', 'Ernakulam', 'Idukki'],
+                    ['Kannur', 'Kasargod', 'Kollam'],
+                    ['Kottayam', 'Kozhikode', 'Malappuram'],
+                    ['Palakkad', 'Pathanamthitta', 'Thiruvanathapuram'],
+                    ['Thrissur', 'Wayanad'],
+                ],
+                "one_time_keyboard": true,
             }
         )};
+    
+    const removeKeyboard = {
+        "reply_markup": {
+            "remove_keyboard": true
+        }
+      }
 
-    const districtMessage = `*Please reply with the name of your district* \n
-    Alappuzha
-    Ernakulam
-    Idukki
-    Kannur
-    Kasaragod
-    Kollam
-    Kottayam
-    Kozhikode
-    Malappuram
-    Palakkad
-    Pathanamthitta
-    Thiruvananthapuram
-    Thrissur
-    Wayanad`
+    const districtMessage = `Please select your district.`
 
     bot.sendMessage(
         chatId,
         districtMessage, 
         sendOpts,
-    ).then(function(sended) {
-        var chatId = sended.chat.id;
-        var messageId = sended.message_id;
-        bot.onReplyToMessage(chatId, messageId, async function (message) {
-            bot.sendMessage(
-                chatId,
-                `District selected: ${message.text}`
-            )
+    )
 
-            var districtId = await getDistrictID(message.text, stateId)
-            
+    bot.onText(/.+/g, async function (message, match) {
+
+            var districtId = await getDistrictID(match[0])     
+
             if (await addUserId(districtId, chatId)) {
                 bot.sendMessage(
                 chatId,
-                `You've been subscribed to updates.`
+                `You've been subscribed to updates from ${match[0]} district`,
+                removeKeyboard
             )}
 
             else {
                 bot.sendMessage(
                 chatId,
-                `There's been an issue. Try again`
+                `There's been an issue with your request. Have you already subscribed to a district?`,
+                removeKeyboard
                 )}
+
+                bot.removeTextListener(/.+/g)
         });
     })
-}
-
 
 bot.onText(/\/unsubscribe/, (msg) => {
     const chatId = msg.chat.id;
@@ -132,7 +123,7 @@ bot.onText(/\/unsubscribe/, (msg) => {
 
     bot.sendMessage(
         chatId,
-        `You've been unsubscibed from updates.`,
+        `You've been unsubscibed from all updates.`,
     )
 })
 
@@ -141,13 +132,6 @@ bot.on('polling_error', (error) => {
     console.log(error);
 
 });
-
-// cron.schedule('*/30 * * * * *', async () => {
-
-//     checkCenters()
-//     console.log(run)
-
-// })
 
 cron.schedule('*/5 * * * *', async () => {
     

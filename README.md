@@ -1,12 +1,12 @@
 # COVID Kerala
-A Telegram bot to notify users of district-wise availability of vaccines and other relevant announcement or information. 
+A Telegram bot to notify users of district-wise availability of vaccines and other relevant announcements, information or statistics.
 
 ### Configuring a testing environment 
 
 1. Create a bot for testing on botfather and copy the token
 2. Make sure you have docker up and running on your machine
 3. Create a docker-compose.yml in the root directory of the repository
-4. Add the following code snippet to the file replacing <TOKEN> with you bot token.
+4. Add the following code snippet to the file replacing <TOKEN> with your bot token.
   
   ```
   version: "3.7"
@@ -32,4 +32,4 @@ services:
 
 *New releses are automatically built and pushed into production*
 
-The production version is currently runninng on *@covidkeralabot* 
+The production version is currently runninng on **@covidkeralabot**

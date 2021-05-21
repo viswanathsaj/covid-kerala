@@ -10,18 +10,21 @@ import emoji from 'node-emoji'
 
 connectMongo()
 
-async function addUserId(distId, Id) {
-    if(await Chats.exists({ chats: Id })){
+async function addUserId(distId, Id) 
+{
+    if(await Chats.exists({ chats: Id }))
+    {
         return false
     }
     
-    else if (await Chats.exists({ district: distId })) {
-        
+    else if (await Chats.exists({ district: distId })) 
+    {    
         await Chats.updateOne({district: distId }, { $push: { chats:  Id  }})
         return true
     }
 
-    else  {
+    else  
+    {
         const district = new Chats({ district: distId }) 
         district.chats.push(Id)
         district.save()
@@ -29,10 +32,9 @@ async function addUserId(distId, Id) {
     }
 }
 
-async function removeUserId(Id) {
-
-await Chats.updateMany({ }, { $pull: { chats:  Id  }})
-
+async function removeUserId(Id) 
+{
+    await Chats.updateMany({ }, { $pull: { chats:  Id  }})
 }
 
 bot.onText(/\/start/, (msg) => {

@@ -9,18 +9,21 @@ import Chats from '../models/chats'
 
 connectMongo()
 
-async function addUserId(distId, Id) {
-    if(await Chats.exists({ chats: Id })){
+async function addUserId(distId, Id) 
+{
+    if(await Chats.exists({ chats: Id }))
+    {
         return false
     }
     
-    else if (await Chats.exists({ district: distId })) {
-        
+    else if (await Chats.exists({ district: distId })) 
+    {    
         await Chats.updateOne({district: distId }, { $push: { chats:  Id  }})
         return true
     }
 
-    else  {
+    else  
+    {
         const district = new Chats({ district: distId }) 
         district.chats.push(Id)
         district.save()
@@ -28,10 +31,9 @@ async function addUserId(distId, Id) {
     }
 }
 
-async function removeUserId(Id) {
-
-await Chats.updateMany({ }, { $pull: { chats:  Id  }})
-
+async function removeUserId(Id) 
+{
+    await Chats.updateMany({ }, { $pull: { chats:  Id  }})
 }
 
 bot.onText(/\/start/, (msg) => {
@@ -151,7 +153,11 @@ cron.schedule('* */6 * * *', async () => {
 
 cron.schedule('0 20 * * *', async () => {
     await sendStats()
+<<<<<<< HEAD
 }, {
     scheduled: true,
     timezone: "Asia/Kolkata"
   })
+=======
+})
+>>>>>>> e78e302f8c5d59c8a73264d172c08f06a36316b9

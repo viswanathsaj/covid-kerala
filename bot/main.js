@@ -6,7 +6,6 @@ import { notifyCenters, deletePrevData }  from "../lib/components/notifyCenters"
 import { sendStats } from '../lib/components/sendStats'
 import cron from 'node-cron'
 import Chats from '../models/chats'
-import emoji from 'node-emoji'
 
 connectMongo()
 
@@ -41,17 +40,19 @@ bot.onText(/\/start/, (msg) => {
         parse_mode : "MarkdownV2",
         };
     
-    const startMessage = emoji.emojify(
+    const startMessage =
 
-        `*COVID Kerala* \n\n/subscribe \n/unsubscribe`
-        
-        )
+`
+🌴 *COVID Kerala*
 
+⭕ To get notifed of vaccines when they become available and updates on daily statistics and hyperlocal news 
+/subscribe to updates
 
-    const chatId = msg.chat.id;
-    console.log(chatId)
+🛑 To stop recieving them /unsubscribe from updates
+`
+
     bot.sendMessage(
-        chatId,
+        msg.chat.id,
         startMessage, 
         sendOpts
     )
@@ -76,11 +77,10 @@ bot.onText(/\/subscribe/, (msg) => {
             }
         )};
 
-    const getDistritMessage = emoji.emojify(
+    const getDistritMessage = 
         
-        'Please select your district. :heart:'
-        
-        )
+`🏠 Please select your district from the keyboard below`
+
 
     bot.sendMessage(
         chatId,
@@ -97,28 +97,27 @@ bot.onText(/\/subscribe/, (msg) => {
             }
 
             var districtId = await getDistrictID(match[0])     
-
-            if (await addUserId(districtId, chatId)) {
+            
+            if (districtId != 0) {
+                if (await addUserId(districtId, chatId) ) {
                 bot.sendMessage(
                 chatId,
-                emoji.emojify(
+`✅ You've been subscribed to updates from ${match[0]} District
 
-                    `You've been subscribed to updates from ${match[0]} District`
-                    
-                    ),
+You'll be notified within 5 minutes of vaccine data being updated and as soon as new statistics become available
+
+News will be coming soon and you can 
+/unsubscribe anytime`,
                 removeKeyboard
             )}
 
             else {
                 bot.sendMessage(
                 chatId,
-                emoji.emojify(
-                    
-                    `There's been an issue with your request. Have you already subscribed to a district?`
-                    
-                    ),
+                `🚨 There's been an issue with your request. Have you already subscribed to a district?`,
                 removeKeyboard
                 )}
+            }
 
                 bot.removeTextListener(/.+/g)
         });
@@ -131,15 +130,10 @@ bot.onText(/\/unsubscribe/, (msg) => {
 
     bot.sendMessage(
         chatId,
-        emoji.emojify(
-
-            `You've been unsubscibed from all updates.`
-            
-            ),
+        `🛑 You've been unsubscibed from all updates`,
     )
+            
 })
-
-sendStats()
 
 bot.on('polling_error', (error) => {
 
@@ -153,5 +147,11 @@ cron.schedule('*/5 * * * *', async () => {
 
 cron.schedule('* */6 * * *', async () => {
     await deletePrevData()
-    await sendStats()
 })
+
+cron.schedule('0 20 * * *', async () => {
+    await sendStats()
+}, {
+    scheduled: true,
+    timezone: "Asia/Kolkata"
+  })

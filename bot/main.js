@@ -1,28 +1,14 @@
 process.env.NTBA_FIX_319 = 'test';
-import TelegramBot from 'node-telegram-bot-api'
-import getDistrictID from '../lib/components/DistrictList'
-import { checkCenters, deletePrevData }  from "../lib/components/checkCenters"
+import bot from '../lib/components/botObject'
+import connectMongo from '../lib/components/connectMongo'
+import { getDistrictID } from '../lib/components/DistrictList'
+import { notifyCenters, deletePrevData }  from "../lib/components/notifyCenters"
+import { sendStats } from '../lib/components/sendStats'
 import cron from 'node-cron'
-import dotenv from 'dotenv'
-import mongoose from 'mongoose'
 import Chats from '../models/chats'
+import emoji from 'node-emoji'
 
-dotenv.config()
-
-const bot = new TelegramBot(process.env.TELEGRAM_TOKEN, {polling: true});
-
-async function connect() {
-    await mongoose.connect(
-        "mongodb://mongodb:27017/kerala-covid",
-        {
-            useUnifiedTopology: true,
-            useNewUrlParser: true
-        }
-);
-console.log("Connected")
-}
-
-connect()
+connectMongo()
 
 async function addUserId(distId, Id) {
     if(await Chats.exists({ chats: Id })){
@@ -54,17 +40,27 @@ bot.onText(/\/start/, (msg) => {
     var sendOpts = {
         parse_mode : "MarkdownV2",
         };
+    
+    const startMessage = emoji.emojify(
+
+        `*COVID Kerala* \n\n/subscribe \n/unsubscribe`
+        
+        )
+
 
     const chatId = msg.chat.id;
+    console.log(chatId)
     bot.sendMessage(
         chatId,
-        '*COVID Helper India* \n\n/subscribe \n/unsubscribe ', sendOpts
+        startMessage, 
+        sendOpts
     )
 })
 
 bot.onText(/\/subscribe/, (msg) => {
     
     const chatId = msg.chat.id;
+    
     const sendOpts = {
         parse_mode : "Markdown",
         reply_markup: JSON.stringify(
@@ -73,42 +69,54 @@ bot.onText(/\/subscribe/, (msg) => {
                     ['Alapuzha', 'Ernakulam', 'Idukki'],
                     ['Kannur', 'Kasargod', 'Kollam'],
                     ['Kottayam', 'Kozhikode', 'Malappuram'],
-                    ['Palakkad', 'Pathanamthitta', 'Thiruvanathapuram'],
-                    ['Thrissur', 'Wayanad'],
+                    ['Palakkad', 'Thrissur', 'Wayanad'],
+                    ['Pathanamthitta', 'Thiruvanathapuram'],
                 ],
                 "one_time_keyboard": true,
             }
         )};
-    
-    const removeKeyboard = {
-        "reply_markup": {
-            "remove_keyboard": true
-        }
-      }
 
-    const districtMessage = `Please select your district.`
+    const getDistritMessage = emoji.emojify(
+        
+        'Please select your district. :heart:'
+        
+        )
 
     bot.sendMessage(
         chatId,
-        districtMessage, 
+        getDistritMessage, 
         sendOpts,
     )
 
     bot.onText(/.+/g, async function (message, match) {
+
+            const removeKeyboard = {
+                "reply_markup": {
+                    "remove_keyboard": true
+                }
+            }
 
             var districtId = await getDistrictID(match[0])     
 
             if (await addUserId(districtId, chatId)) {
                 bot.sendMessage(
                 chatId,
-                `You've been subscribed to updates from ${match[0]} district`,
+                emoji.emojify(
+
+                    `You've been subscribed to updates from ${match[0]} District`
+                    
+                    ),
                 removeKeyboard
             )}
 
             else {
                 bot.sendMessage(
                 chatId,
-                `There's been an issue with your request. Have you already subscribed to a district?`,
+                emoji.emojify(
+                    
+                    `There's been an issue with your request. Have you already subscribed to a district?`
+                    
+                    ),
                 removeKeyboard
                 )}
 
@@ -123,9 +131,15 @@ bot.onText(/\/unsubscribe/, (msg) => {
 
     bot.sendMessage(
         chatId,
-        `You've been unsubscibed from all updates.`,
+        emoji.emojify(
+
+            `You've been unsubscibed from all updates.`
+            
+            ),
     )
 })
+
+sendStats()
 
 bot.on('polling_error', (error) => {
 
@@ -134,31 +148,7 @@ bot.on('polling_error', (error) => {
 });
 
 cron.schedule('*/5 * * * *', async () => {
-    
-    let sendOpts = {
-        parse_mode : "MarkdownV2",
-        };
-    
-    let Data = []
-    Data = await checkCenters()
-
-    Data.map((district) => {
-        
-        if(district != 0) {
-
-            district.map((obj) => {
-                const chatList = obj.chats
-                chatList.map((chat) => {
-                    bot.sendMessage(
-                        chat,
-                        obj.message, 
-                        sendOpts,
-                    )
-                }) 
-            })
-
-        }
-    })
+    await notifyCenters()
 })
 
 cron.schedule('* */6 * * *', async () => {

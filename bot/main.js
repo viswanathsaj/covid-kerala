@@ -153,11 +153,7 @@ cron.schedule('* */6 * * *', async () => {
 
 cron.schedule('0 20 * * *', async () => {
     await sendStats()
-<<<<<<< HEAD
 }, {
     scheduled: true,
     timezone: "Asia/Kolkata"
   })
-=======
-})
->>>>>>> e78e302f8c5d59c8a73264d172c08f06a36316b9

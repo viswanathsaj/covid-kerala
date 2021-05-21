@@ -153,4 +153,5 @@ cron.schedule('*/5 * * * *', async () => {
 
 cron.schedule('* */6 * * *', async () => {
     await deletePrevData()
+    await sendStats()
 })

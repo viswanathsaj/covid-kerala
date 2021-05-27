@@ -9,6 +9,8 @@ import Chats from '../models/chats'
 
 connectMongo()
 
+//Fuck
+
 async function addUserId(distId, Id) 
 {
     if(await Chats.exists({ chats: Id }))
@@ -45,8 +47,6 @@ bot.onText(/\/start/, (msg) => {
     const startMessage =
 
 `
-🌴 *COVID Kerala*
-
 ⭕ To get notifed of vaccines when they become available and updates on daily statistics and hyperlocal news 
 /subscribe to updates
 
